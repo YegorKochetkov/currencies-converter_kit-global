@@ -1,26 +1,29 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React from "react";
+import React, { useState } from "react";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import { useDispatch } from "react-redux";
 import { useAppSelector } from "../../redux/hooks";
-import { selectBaseCurrency } from "../../redux/baseCurrencySlice";
+import { selectBaseCurrency, setBaseCurrency } from "../../redux/baseCurrencySlice";
 import { useGetRatesQuery } from "../../redux/currenciesApi";
 
-type Props = {
-  // eslint-disable-next-line no-unused-vars
-  handleSelectChange: (event: SelectChangeEvent) => void,
-}
-
-export const Selector: React.FC<Props> = ({ handleSelectChange }) => {
+export const Selector: React.FC = () => {
+  const dispatch = useDispatch();
   const baseCurrency = useAppSelector(selectBaseCurrency);
   const { data } = useGetRatesQuery(baseCurrency);
   const currenciesNames = data && Object.keys(data.rates);
 
+  const [selectValue, setSelectValue] = useState(localStorage.getItem("baseCurrency") || "");
+  const handleSelectChange = (event: SelectChangeEvent) => {
+    dispatch(setBaseCurrency(event.target.value));
+    setSelectValue(event.target.value);
+  };
+
   return (
     <FormControl>
       <Select
-        value={baseCurrency}
+        value={selectValue}
         onChange={handleSelectChange}
         inputProps={{ "aria-label": "Without label" }}
       >

@@ -1,16 +1,15 @@
 /* eslint-disable react/require-default-props */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable prefer-destructuring */
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Paper from "@mui/material/Paper";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import { SelectChangeEvent } from "@mui/material/Select";
 import { useGetRatesQuery } from "./redux/currenciesApi";
-import { useAppDispatch, useAppSelector } from "./redux/hooks";
-import { selectBaseCurrency, setBaseCurrency } from "./redux/baseCurrencySlice";
+import { useAppSelector } from "./redux/hooks";
+import { selectBaseCurrency } from "./redux/baseCurrencySlice";
 import { Loader } from "./components/Loader/Loader";
 import { Converter } from "./components/Converter/Converter";
 import { Selector } from "./components/Selector/Selector";
@@ -55,85 +54,15 @@ function a11yProps(index: number) {
 }
 
 function App() {
-  const dispatch = useAppDispatch();
   const baseCurrency = useAppSelector(selectBaseCurrency);
+  localStorage.setItem("baseCurrency", baseCurrency);
 
-  const [selectValue, setSelectValue] = useState("");
-  const handleSelectChange = (event: SelectChangeEvent) => {
-    dispatch(setBaseCurrency(event.target.value));
-  };
-
-  const { data, isFetching, error } = useGetRatesQuery(baseCurrency);
-  const rates = data && Object.entries(data.rates);
-  const currenciesNames = data && Object.keys(data.rates);
+  const { isFetching } = useGetRatesQuery(baseCurrency);
 
   const [tabs, setTab] = React.useState(0);
   const handleTabChange = (event: React.SyntheticEvent, newTab: number) => {
     setTab(newTab);
   };
-
-  const [result, setResult] = useState("Please, enter valid data");
-  const handleInputChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    setSelectValue(event.target.value);
-  };
-
-  let errMsg = "";
-  let errStatus = "";
-  if (error) {
-    if ("status" in error) {
-      errStatus = error.status.toString();
-      errMsg = "error" in error ? error.error : JSON.stringify(error.data);
-    }
-  }
-
-  useEffect(() => {
-    const inputWords = selectValue.trim().split(" ").filter((word) => word.toLowerCase() !== "in");
-    let amount = 0;
-    let from = "";
-    let fromRate = 0;
-    let to = "";
-    let toRate = 0;
-    let isValidInput = false;
-
-    if (inputWords.length && currenciesNames) {
-      amount = Number(inputWords[0]?.toUpperCase());
-      from = inputWords[1]?.toUpperCase();
-      to = inputWords[2]?.toUpperCase();
-
-      isValidInput = amount > 0
-        && currenciesNames.includes(from?.toUpperCase())
-        && currenciesNames.includes(to?.toUpperCase());
-    }
-
-    if (isValidInput && rates) {
-      rates.forEach((rate) => {
-        if (rate[0] === from.toUpperCase()) {
-          fromRate = rate[1];
-        }
-
-        if (rate[0] === to.toUpperCase()) {
-          toRate = rate[1];
-        }
-      });
-
-      let convertAmount = from.toUpperCase() === baseCurrency
-        ? (+amount * fromRate * toRate)
-        : ((+amount * fromRate) / toRate);
-
-      convertAmount = (from.toUpperCase() !== baseCurrency && to.toUpperCase() !== baseCurrency)
-        ? ((+amount * toRate) / fromRate)
-        : convertAmount;
-      setResult(`${amount} ${from} is equal to ${convertAmount.toFixed(3)} ${to}`);
-    } else {
-      setResult("Please, enter valid data");
-    }
-
-    if (errStatus === "429") {
-      setResult(errMsg);
-    }
-  }, [selectValue]);
 
   return (
     <Box
@@ -167,11 +96,7 @@ function App() {
                 gap: 5,
               }}
             >
-              <Converter
-                selectValue={selectValue}
-                result={result}
-                handleInputChange={handleInputChange}
-              />
+              <Converter />
             </Box>
           </TabPanel>
 
@@ -185,7 +110,7 @@ function App() {
             }}
           >
             <TabPanel value={tabs} index={1}>
-              <Selector handleSelectChange={handleSelectChange} />
+              <Selector />
               <RatesTable />
             </TabPanel>
           </Box>
