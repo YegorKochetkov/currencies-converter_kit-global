@@ -7,10 +7,6 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import { useGetRatesQuery } from "./redux/currenciesApi";
-import { useAppSelector } from "./redux/hooks";
-import { selectBaseCurrency } from "./redux/baseCurrencySlice";
-import { Loader } from "./components/Loader/Loader";
 import { Converter } from "./components/Converter/Converter";
 import { Selector } from "./components/Selector/Selector";
 import { RatesTable } from "./components/RatesTable/RatesTable";
@@ -54,11 +50,6 @@ function a11yProps(index: number) {
 }
 
 function App() {
-  const baseCurrency = useAppSelector(selectBaseCurrency);
-  localStorage.setItem("baseCurrency", baseCurrency);
-
-  const { isFetching } = useGetRatesQuery(baseCurrency);
-
   const [tabs, setTab] = React.useState(0);
   const handleTabChange = (event: React.SyntheticEvent, newTab: number) => {
     setTab(newTab);
@@ -79,8 +70,6 @@ function App() {
     >
       <Box sx={{ width: "100%" }}>
         <Paper sx={{ position: "relative" }}>
-          {isFetching && <Loader />}
-
           <Tabs value={tabs} onChange={handleTabChange} aria-label="app tabs">
             <Tab label="Converter" {...a11yProps(0)} />
             <Tab label="Rates" {...a11yProps(1)} />

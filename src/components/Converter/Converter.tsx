@@ -6,11 +6,12 @@ import Typography from "@mui/material/Typography";
 import { useGetRatesQuery } from "../../redux/currenciesApi";
 import { useAppSelector } from "../../redux/hooks";
 import { selectBaseCurrency } from "../../redux/baseCurrencySlice";
+import { Loader } from "../Loader/Loader";
 
 export const Converter: React.FC = () => {
   const baseCurrency = useAppSelector(selectBaseCurrency);
 
-  const { data, error } = useGetRatesQuery(baseCurrency);
+  const { data, error, isFetching } = useGetRatesQuery(baseCurrency);
   const rates = data && Object.entries(data.rates);
   const currenciesNames = data && Object.keys(data.rates);
 
@@ -76,6 +77,7 @@ export const Converter: React.FC = () => {
         ? ((+amount * toRate) / fromRate)
         : convertAmount;
       setResult(`${amount} ${from} is equal to ${convertAmount.toFixed(3)} ${to}`);
+      localStorage.setItem("baseCurrency", from);
     } else {
       setResult("Please, enter valid data");
     }
@@ -83,6 +85,7 @@ export const Converter: React.FC = () => {
 
   return (
     <>
+      {isFetching && <Loader />}
       <TextField
         id="outlined-basic"
         label='Input data in format "15 usd in uah"'

@@ -4,6 +4,7 @@
     "browserslist",
     "FLEXBOX",
     "Immer",
-    "reduxjs"
+    "reduxjs",
+    "testid"
   ]
 }
