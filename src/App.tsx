@@ -89,7 +89,7 @@ function App() {
   }
 
   useEffect(() => {
-    const inputWords = selectValue.trim().split(" ").filter((word) => word !== "in");
+    const inputWords = selectValue.trim().split(" ").filter((word) => word.toLowerCase() !== "in");
     let amount = 0;
     let from = "";
     let fromRate = 0;
