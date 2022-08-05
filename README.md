@@ -1,5 +1,7 @@
 # Тестовое Задание “React (Junior)”
 
+##   [Демо](https://yegorkochetkov.github.io/currencies-converter_kit-global/)
+
 ## «Разработка React приложения для конвертации валюты”
 
 Напишите SPA для конвертирования валют. Для получения текущих курсов
