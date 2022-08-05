@@ -11,7 +11,7 @@ import { useAppSelector } from "../../redux/hooks";
 import { selectBaseCurrency } from "../../redux/baseCurrencySlice";
 
 export const RatesTable = () => {
-  const baseCurrency = localStorage.getItem("baseCurrency") || useAppSelector(selectBaseCurrency);
+  const baseCurrency = useAppSelector(selectBaseCurrency);
   const { data } = useGetRatesQuery(baseCurrency);
   const rates = data && Object.entries(data.rates);
 
