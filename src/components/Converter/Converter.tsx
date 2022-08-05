@@ -22,7 +22,7 @@ export const Converter: React.FC = () => {
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     if (!error) {
-      setInputValue(event.target.value);
+      setInputValue(event.target.value.replace(/  +/g, " "));
     }
   };
 
