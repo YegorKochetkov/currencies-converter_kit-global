@@ -69,13 +69,12 @@ export const Converter: React.FC = () => {
         }
       });
 
-      let convertAmount = from.toUpperCase() === baseCurrency
-        ? (+amount * fromRate * toRate)
-        : ((+amount * fromRate) / toRate);
+      let convertAmount = (+amount * toRate) / fromRate;
 
-      convertAmount = (from.toUpperCase() !== baseCurrency && to.toUpperCase() !== baseCurrency)
+      convertAmount = (from !== baseCurrency && to !== baseCurrency)
         ? ((+amount * toRate) / fromRate)
         : convertAmount;
+
       setResult(`${amount} ${from} is equal to ${convertAmount.toFixed(3)} ${to}`);
       localStorage.setItem("baseCurrency", from);
     } else {

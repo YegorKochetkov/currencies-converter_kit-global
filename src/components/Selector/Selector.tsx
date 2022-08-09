@@ -4,19 +4,13 @@ import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import { useDispatch } from "react-redux";
-// import { useAppSelector } from "../../redux/hooks";
-// import { selectBaseCurrency, setBaseCurrency } from "../../redux/baseCurrencySlice";
-import { setBaseCurrency } from "../../redux/baseCurrencySlice";
+import { selectBaseCurrency, setBaseCurrency } from "../../redux/baseCurrencySlice";
 import { useGetRatesQuery } from "../../redux/currenciesApi";
+import { useAppSelector } from "../../redux/hooks";
 
 export const Selector: React.FC = () => {
   const dispatch = useDispatch();
-  const baseCurrency = localStorage.getItem("baseCurrency") || "PLN";
-  // if (baseCurrency) {
-  //   dispatch(setBaseCurrency(baseCurrency));
-  // } else {
-  //   baseCurrency = useAppSelector(selectBaseCurrency);
-  // }
+  const baseCurrency = localStorage.getItem("baseCurrency") || useAppSelector(selectBaseCurrency);
 
   const { data } = useGetRatesQuery(baseCurrency);
   const currenciesNames = data && Object.keys(data.rates);
