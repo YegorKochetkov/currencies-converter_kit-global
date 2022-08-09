@@ -3,14 +3,16 @@
 import React, { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import { useDispatch } from "react-redux";
 import { useGetRatesQuery } from "../../redux/currenciesApi";
 import { useAppSelector } from "../../redux/hooks";
-import { selectBaseCurrency } from "../../redux/baseCurrencySlice";
+import { selectBaseCurrency, setBaseCurrency } from "../../redux/baseCurrencySlice";
 import { Loader } from "../Loader/Loader";
 import useDebounce from "../../hooks/useDebounce";
 
 export const Converter: React.FC = () => {
   const baseCurrency = useAppSelector(selectBaseCurrency);
+  const dispatch = useDispatch();
 
   const { data, error, isFetching } = useGetRatesQuery(baseCurrency);
   const rates = data && Object.entries(data.rates);
@@ -18,12 +20,16 @@ export const Converter: React.FC = () => {
 
   const [result, setResult] = useState("");
   const [inputValue, setInputValue] = useState("");
+  const [isCalculated, setIsCalculated] = useState(false);
   const debouncedInput = useDebounce(inputValue, 500);
 
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setResult("");
+    if (!isCalculated) {
+      setResult("");
+    }
+
     if (!error) {
       setInputValue(event.target.value.replace(/  +/g, " "));
     }
@@ -42,9 +48,13 @@ export const Converter: React.FC = () => {
     }
   }, [error]);
 
-  let isValidInput = false;
   useEffect(() => {
-    const inputWords = debouncedInput.trim().split(" ").filter((word) => word.toLowerCase() !== "in");
+    const inputWords = debouncedInput
+      .trim()
+      .split(" ")
+      .filter((word) => word.toLowerCase() !== "in");
+
+    let isValidInput = false;
     let amount = 0;
     let from = "";
     let fromRate = 0;
@@ -79,7 +89,11 @@ export const Converter: React.FC = () => {
         : convertAmount;
 
       setResult(`${amount} ${from} is equal to ${convertAmount.toFixed(3)} ${to}`);
+      setIsCalculated(true);
+
       localStorage.setItem("baseCurrency", from);
+
+      dispatch(setBaseCurrency(from));
     } else if (inputValue !== "") {
       setResult("Please, enter valid data");
     }

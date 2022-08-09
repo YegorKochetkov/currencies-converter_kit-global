@@ -12,7 +12,7 @@ import { selectBaseCurrency } from "../../redux/baseCurrencySlice";
 import { Loader } from "../Loader/Loader";
 
 export const RatesTable = () => {
-  const baseCurrency = localStorage.getItem("baseCurrency") || useAppSelector(selectBaseCurrency);
+  const baseCurrency = useAppSelector(selectBaseCurrency);
   const { data, isFetching } = useGetRatesQuery(baseCurrency);
   const rates = data && Object.entries(data.rates);
 

@@ -7,36 +7,41 @@ import { useDispatch } from "react-redux";
 import { selectBaseCurrency, setBaseCurrency } from "../../redux/baseCurrencySlice";
 import { useGetRatesQuery } from "../../redux/currenciesApi";
 import { useAppSelector } from "../../redux/hooks";
+import { Loader } from "../Loader/Loader";
 
 export const Selector: React.FC = () => {
   const dispatch = useDispatch();
   const baseCurrency = localStorage.getItem("baseCurrency") || useAppSelector(selectBaseCurrency);
 
-  const { data } = useGetRatesQuery(baseCurrency);
+  const { data, isFetching } = useGetRatesQuery(baseCurrency);
   const currenciesNames = data && Object.keys(data.rates);
 
   const [selectedValue, setSelectedValue] = useState(baseCurrency);
+
   const handleSelectChange = (event: SelectChangeEvent) => {
     setSelectedValue(event.target.value);
     dispatch(setBaseCurrency(event.target.value));
   };
 
   return (
-    <FormControl>
-      <Select
-        value={selectedValue}
-        onChange={handleSelectChange}
-        inputProps={{ "aria-label": "Without label" }}
-      >
-        {currenciesNames?.map((currency) => (
-          <MenuItem
-            value={currency}
-            key={currency}
-          >
-            {currency}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+    <>
+      {isFetching && <Loader />}
+      <FormControl>
+        <Select
+          value={selectedValue}
+          onChange={handleSelectChange}
+          inputProps={{ "aria-label": "Without label" }}
+        >
+          {currenciesNames?.map((currency) => (
+            <MenuItem
+              value={currency}
+              key={currency}
+            >
+              {currency}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </>
   );
 };
