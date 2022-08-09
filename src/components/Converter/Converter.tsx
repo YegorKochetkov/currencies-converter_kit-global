@@ -30,6 +30,10 @@ export const Converter: React.FC = () => {
       setResult("");
     }
 
+    if (isCalculated && event.target.value === "") {
+      setResult("");
+    }
+
     if (!error) {
       setInputValue(event.target.value.replace(/  +/g, " "));
     }
@@ -95,6 +99,7 @@ export const Converter: React.FC = () => {
 
       dispatch(setBaseCurrency(from));
     } else if (inputValue !== "") {
+      setIsCalculated(false);
       setResult("Please, enter valid data");
     }
   }, [debouncedInput]);
