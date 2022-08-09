@@ -7,6 +7,7 @@ import { useGetRatesQuery } from "../../redux/currenciesApi";
 import { useAppSelector } from "../../redux/hooks";
 import { selectBaseCurrency } from "../../redux/baseCurrencySlice";
 import { Loader } from "../Loader/Loader";
+import useDebounce from "../../hooks/useDebounce";
 
 export const Converter: React.FC = () => {
   const baseCurrency = useAppSelector(selectBaseCurrency);
@@ -15,12 +16,14 @@ export const Converter: React.FC = () => {
   const rates = data && Object.entries(data.rates);
   const currenciesNames = data && Object.keys(data.rates);
 
-  const [result, setResult] = useState("Please, enter valid data");
+  const [result, setResult] = useState("");
   const [inputValue, setInputValue] = useState("");
+  const debouncedInput = useDebounce(inputValue, 500);
 
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
+    setResult("");
     if (!error) {
       setInputValue(event.target.value.replace(/  +/g, " "));
     }
@@ -39,14 +42,14 @@ export const Converter: React.FC = () => {
     }
   }, [error]);
 
+  let isValidInput = false;
   useEffect(() => {
-    const inputWords = inputValue.trim().split(" ").filter((word) => word.toLowerCase() !== "in");
+    const inputWords = debouncedInput.trim().split(" ").filter((word) => word.toLowerCase() !== "in");
     let amount = 0;
     let from = "";
     let fromRate = 0;
     let to = "";
     let toRate = 0;
-    let isValidInput = false;
 
     if (inputWords.length && currenciesNames) {
       amount = Number(inputWords[0]?.toUpperCase());
@@ -77,10 +80,10 @@ export const Converter: React.FC = () => {
 
       setResult(`${amount} ${from} is equal to ${convertAmount.toFixed(3)} ${to}`);
       localStorage.setItem("baseCurrency", from);
-    } else {
+    } else if (inputValue !== "") {
       setResult("Please, enter valid data");
     }
-  }, [inputValue]);
+  }, [debouncedInput]);
 
   return (
     <>
